@@ -1,0 +1,41 @@
+<div>
+  <div class="container text-center">
+
+      <div class="row">
+          <div class="col-5 text-center">
+              <input type="text" [(ngModel)]="src" >
+
+
+              <img #img src="{{src}}" (load)="afterLoading();ngAfterViewInit()" style='display: none;' />
+              <canvas #visualization width={{imgWidth}} height={{imgHeight}}></canvas>
+          </div>
+          <div class="col-5 text-center">
+              <input type="text" [(ngModel)]="src2">
+
+
+              <img #img2 src="{{src2}}" (load)="afterLoading();ngAfterViewInit()" style='display: none;' />
+              <canvas #visualization2 width={{imgWidth}} height={{imgHeight}}></canvas>
+
+          </div>
+      </div>
+      <div *ngFor ="let item of items | async">
+        {{item.nom}}<br>
+        {{item.prenom}}<br>
+        {{item.tel}}<br>
+        {{item.imageUrl}}<br>
+        <button (click)="onDelete(item.key)">Delete</button><br>
+    </div>
+      <div class="row justify-content-center">
+          <button (click)="onAfficher()">Verify the two Faces</button>
+      </div>
+      <div class="row justify-content-center"> 
+          <ul>
+              <li>is Identical : {{comparisation.isIdentical}}</li> <br>
+              <li>Pourtentage de ressemblance : {{ comparisation.confidence * 100 }}% </li>
+              <li>
+                  <span  >  {{compIdFace}}</span>
+              </li>
+          </ul>
+      </div>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+<form #f="ngForm" (ngSubmit)="onSubmit(f)">
+    Nom : <input name="nom" ngModel type="text"><br>
+    Prénom : <input name="prenom" ngModel type="text"><br>
+    tel : <input name="tel" ngModel type="number"><br>
+    imageUrl: <input name="imageUrl" ngModel [(ngModel)]="downloadURL" type="text"><br>
+    <input name="photo" type="file"  (change)="uploadFile($event)">
+    <button>Add</button>
+  
+  </form>
+
+  <ul >
+    <li>
+        <span *ngFor ="let item of items | async">
+                {{item.nom}}<br>
+                {{item.prenom}}<br>
+                {{item.tel}}<br>
+                {{item.imageUrl}}<br>
+                <button (click)="onDelete(item.key)">Delete</button><br>
+        </span>
+    </li>
+</ul>
+
+{{ fileurl | async | json }}
+
