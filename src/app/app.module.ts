@@ -11,12 +11,22 @@ import { AngularFireAuthModule } from '@angular/fire/auth';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { Http, HttpModule } from '@angular/http';
 import { FacedetectComponent } from './facedetect/facedetect.component';
+import { FaceCamDetectComponent } from './face-cam-detect/face-cam-detect.component';
+import { LoginComponent } from './login/login.component';
+import { SignupComponent } from './signup/signup.component';
+
+import { AccessDoneComponent } from './access-done/access-done.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ListMemberComponent,
-    FacedetectComponent
+    FacedetectComponent,
+    FaceCamDetectComponent,
+    LoginComponent,
+    SignupComponent,
+    
+    AccessDoneComponent
   ],
   imports: [
     BrowserModule,

@@ -9,6 +9,7 @@ import { NgForm } from '@angular/forms';
 import { AngularFireStorage } from '@angular/fire/storage';
 import {ListMemberComponent} from '../list-member/list-member.component';
 import { async } from '@angular/core/testing';
+import { Router } from '@angular/router';
 
 
 
@@ -25,9 +26,16 @@ export class FacedetectComponent implements OnInit {
   personnes1: any = [];
   personnes2: any = [];
   comparisation: any = [];
+  N_requestVerify;
 
   @ViewChild("visualization") visualization: ElementRef;
   @ViewChild('img') img: ElementRef;
+
+  @ViewChild("video")
+  public video: ElementRef;
+
+  @ViewChild("canvas")
+  public canvas: ElementRef;
 
   @ViewChild("visualization2") visualization2: ElementRef;
   @ViewChild('img2') img2: ElementRef;
@@ -38,6 +46,7 @@ export class FacedetectComponent implements OnInit {
   private context2: CanvasRenderingContext2D;
   private element2: HTMLImageElement;
 
+  photo;
   src: string;
   src2: string;
   imgWidth: number;
@@ -46,16 +55,17 @@ export class FacedetectComponent implements OnInit {
   isIdentical;
   personTrue;
   j;
-  compIdFace: any = [];
+  compIdFace;
   IdFace1: string;
   IdFace2: string;
   imgTab: any = [];
   items: Observable<any[]>;
   itemsRef: AngularFireList<any>;
+  NbrUser;
 
 
 
-  constructor(private dataService: DataService, private dataVerify: VerifyService, db: AngularFireDatabase, private storage: AngularFireStorage) {
+  constructor(private dataService: DataService, private dataVerify: VerifyService, public router:Router ,db: AngularFireDatabase, private storage: AngularFireStorage) {
    
     this.itemsRef = db.list('users');
     // Use snapshotChanges().map() to store the key
@@ -82,7 +92,7 @@ export class FacedetectComponent implements OnInit {
 
   }
 
-  ngAfterViewInit() {
+  /*ngAfterViewInit() {
 
     
 
@@ -98,7 +108,7 @@ export class FacedetectComponent implements OnInit {
 
 
 
-  }
+  }*/
 
 
   afterLoading() {
@@ -129,15 +139,31 @@ export class FacedetectComponent implements OnInit {
   }
 
   verifyTwoId(id1, id2) {
+   
+
+  
 
     this.dataVerify.verifyPersonne(id1, id2).subscribe(data => {
 
       this.comparisation = data.json();
-      console.log(this.comparisation);
-      this.compIdFace.push(this.comparisation.isIdentical);
-      console.log(this.compIdFace);
+      
 
+      this.compIdFace=(this.compIdFace||this.comparisation.isIdentical);
+      
+      
+      if (this.comparisation.isIdentical) {
+        this.router.navigate(["accessDone"])
+      } else if ((this.N_requestVerify===this.NbrUser)) {
+        this.router.navigate(["signup"])
+      }
+      console.log("connexion  "+this.comparisation.isIdentical);
+      console.log("nbr Request  "+this.N_requestVerify);
+      console.log("nbr user  "+this.NbrUser);
+      this.N_requestVerify++;
+      
     });
+
+   
 
   }
 
@@ -174,40 +200,58 @@ export class FacedetectComponent implements OnInit {
 
   }
 
-  verifyTabImg(src: string) {
+  verifyTabImg() {
 
-    this.compIdFace = [];
-    this.dataService.getPersonne(src).subscribe(data =>
+    
+    this.picImgCam();
+
+    this.dataService.getPersonneCam(this.photo).subscribe(data =>
       {
+        this.N_requestVerify= 1;
         let personne = data.json();
         let id       = personne[0].faceId;
+        console.log(personne)
         this.items.forEach((item: any) =>{
+          this.NbrUser = item.length
           for (let index = 0; index < item.length; index++) {
             const img = item[index].imageUrl;
-            this.verify_Id_Src(id,img);  
+            this.verify_Id_Src(id,img); 
+            
+            
+            
+            
           }
         });
         
-       /* for (let i = 0; i < items.length; i++) {
-
-          const img = items[i].imageUrl;
-          this.verify_Id_Src(id, img);
-
-          }*/
-        
-        
+        /**/
       });
-      console.log(this.compIdFace);
+      
 
   }
 
-  onAfficher(){
-    this.verifyTabImg("https://cdn.vox-cdn.com/thumbor/JMB4qMewzY8tiE2inHQDsw9AkZ0=/0x231:2456x2073/1200x800/filters:focal(0x231:2456x2073)/cdn.vox-cdn.com/uploads/chorus_image/image/44255874/458999260.0.jpg")
+ 
+
+  public ngAfterViewInit() {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        this.video.nativeElement.srcObject = stream;
+        this.video.nativeElement.play();
+      });
+    }
+
+  }
+  
+  picImgCam(){
+
+    var context = this.canvas.nativeElement.getContext("2d").drawImage(this.video.nativeElement, 0, 0, 640, 480);
+    this.photo = (this.canvas.nativeElement.toDataURL("image/png"));
+    this.video.nativeElement.pause();
   }
 
 
 
   ngOnInit() {
+    
 
   }
 
